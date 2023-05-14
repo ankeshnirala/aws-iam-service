@@ -19,21 +19,24 @@ func (s *Server) handleSignup(ctx *gin.Context) {
 	}
 
 	// check if user already exist with email
-	isUserExist := s.mongoStore.GetUserByEmail(req.Email)
-	if isUserExist != nil {
-		util.WriteJSON(ctx, http.StatusBadRequest, "email already exist")
+	// isUserExist := s.mongoStore.GetUserByEmail(req.Email)
+	_, err := s.mysqlStore.FindByEmail(req.Email)
+
+	if err != nil {
+		util.WriteJSON(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	// create new user if everythig is fine
 	user, err := types.NewRootUser(req.FirstName, req.LastName, req.Email, req.Password)
 	if err != nil {
-		util.WriteJSON(ctx, http.StatusBadRequest, err)
+		util.WriteJSON(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	// insert created user in db
-	insertRes, err := s.mongoStore.CreateUser(user)
+	// insertRes, err := s.mongoStore.CreateUser(user)
+	insertRes, err := s.mysqlStore.Registeration(user)
 	if err != nil {
 		util.WriteJSON(ctx, http.StatusBadRequest, err)
 		return

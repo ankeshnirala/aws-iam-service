@@ -7,9 +7,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const rootRole string = "root"
-const role string = "member"
-
 // user_type?: string;
 // username?: string;
 // email?: string;
@@ -59,10 +56,10 @@ type UserSecondaryDetails struct {
 }
 
 type UserLoginHistory struct {
-	ID     primitive.ObjectID `json:"id"`
-	UserID primitive.ObjectID `json:"userID"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID        primitive.ObjectID `json:"id"`
+	UserID    primitive.ObjectID `json:"userID"`
+	CreatedAt time.Time          `json:"createdAt"`
+	UpdatedAt time.Time          `json:"updatedAt"`
 }
 
 type User struct {
@@ -71,7 +68,7 @@ type User struct {
 	LastName  string             `json:"lastName"`
 	Email     string             `json:"email" validate:"email,required"`
 	Password  string             `json:"password" validate:"required"`
-	Role      string             `json:"role" validate:"required"`
+	IsAdmin   int                `json:"isAdmin" validate:"required"`
 	CreatedAt time.Time          `json:"createdAt"`
 	CreatedBy primitive.ObjectID `json:"createdBy"`
 }
@@ -93,7 +90,7 @@ func NewRootUser(firstName, lastName, email, password string) (*User, error) {
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
-		Role:      rootRole,
+		IsAdmin:   1,
 		Password:  string(encPw),
 		CreatedAt: time.Now().UTC(),
 	}, nil
@@ -118,7 +115,7 @@ func NewUser(firstName, lastName, email, password, createdBy string) (*User, err
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
-		Role:      role,
+		IsAdmin:   0,
 		Password:  string(encPw),
 		CreatedAt: time.Now().UTC(),
 		CreatedBy: objectId,
